@@ -2,7 +2,7 @@
 
 [![Built with askThili](https://ask.thili.ai/api/v1/public/projects/azw584hseh/badge.svg)](https://ask.thili.ai/b/azw584hseh)
 
-This project, 'Supply Co-usage Insight', analyzes medical procedure data to find which supplies are frequently used together. It uses frequent itemset mining to identify strong co-occurring medical supply sets, providing insights for optimizing stock placement and procurement efficiency for hospital administrators.
+This project, 'Supply Co-usage Insight', analyzes medical procedure data to find which supplies are frequently used together. It uses frequent itemset mining (bitset Apriori via `thilimarketbasket`) to identify strong co-occurring medical supply sets, providing insights for optimizing stock placement and procurement efficiency for hospital administrators.
 
 ## What you are building
 
@@ -12,39 +12,42 @@ This project, 'Supply Co-usage Insight', analyzes medical procedure data to find
 
 ## Milestones
 
-Tick these off as you go, and commit after each one.
-
-- [ ] **1. Create mock medical procedure data, where each procedure lists used supply SKUs.**  
-      Hint: Create mock data representing medical procedures and their associated supply SKUs, similar to transaction data.
-- [ ] **2. Implement frequent itemset mining (e.g., using thilimarketbasket).**  
-      Hint: Apply the `lfretail-lfmarketbasket` frequent itemset mining technique.
-- [ ] **3. Analyze and display the most frequent co-occurring supply itemsets.**  
-      Hint: Display and interpret the most frequent itemsets found by the mining algorithm.
-- [ ] **4. Compare the mined itemsets against simple baseline expectations.**  
-      Hint: Establish a simple baseline for comparison, perhaps by looking at individual supply frequencies.
-- [ ] **5. Generate a report of identified supply bundles.**  
-      Hint: Structure your findings into a clear, concise report of the identified supply bundles.
+- [x] **1. Create mock medical procedure data, where each procedure lists used supply SKUs.**  
+      *Implemented in `app/core.py:generate_mock_procedure_data` and CLI command `python -m app.cli generate`.*
+- [x] **2. Implement frequent itemset mining (e.g., using thilimarketbasket).**  
+      *Implemented in `app/core.py:run_frequent_itemset_mining` using bitset Apriori with support monotonicity and CLI command `python -m app.cli mine`.*
+- [x] **3. Analyze and display the most frequent co-occurring supply itemsets.**  
+      *Implemented in `app/core.py:analyze_frequent_bundles` and CLI command `python -m app.cli analyze`.*
+- [x] **4. Compare the mined itemsets against simple baseline expectations.**  
+      *Implemented in `app/core.py:compare_against_baseline` calculating statistical independence baselines and synergy Lift ($>1.5\times$).*
+- [x] **5. Generate a report of identified supply bundles.**  
+      *Implemented in `app/core.py:generate_procurement_report` and CLI command `python -m app.cli report` outputting physical placement and procurement recommendations.*
 
 ## Run it
 
-You need Python 3.12 and git.
+Requires Python 3.12+ (or 3.13) and git.
 
 ```bash
-python3.12 -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+# On Linux/macOS: source .venv/bin/activate
+# On Windows: .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-cp .env.example .env        # then choose a model; see the comments inside
-python -m app.cli hello
-pytest
-```
+cp .env.example .env
 
-Your work goes in `app/core.py` (one stub per milestone) and `tests/test_core.py`. The first tests pass already; they
-check the plumbing.
+# Verify installation
+python -m app.cli hello
+
+# Milestone workflows
+python -m app.cli generate --count 1000
+python -m app.cli mine --min-support 0.10
+python -m app.cli analyze --min-size 2 --top-k 10
+python -m app.cli compare
+python -m app.cli report
+
+# Run unit tests
+pytest -v
+```
 
 ## Settings and secrets
 
-Model settings live in `.env`, which is ignored by git. **Never commit `.env` or paste a key into code.** If a key ever
-reaches GitHub, treat it as leaked and make a new one.
-
-## Stretch ideas
-
-- (none)
+Model settings live in `.env`, which is ignored by git. **Never commit `.env` or paste a key into code.**
